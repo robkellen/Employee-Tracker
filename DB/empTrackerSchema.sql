@@ -22,8 +22,11 @@ CREATE TABLE employee (
   emp_id INT NOT NULL,
   first_name VARCHAR(30) NOT NULL,
   last_name VARCHAR(30) NOT NULL,
-  role_id INT NOT NULL,
+  emp_role_id INT NOT NULL,
   manager_id INT NULL,
+  PRIMARY KEY (emp_ID),
+  FOREIGN KEY (emp_role_id) REFERENCES position_role(role_id),
+  FOREIGN KEY (manager_id) REFERENCES position_role()
 );
 
 SELECT * FROM department;
