@@ -58,8 +58,7 @@ function main() {
           console.log("update emp role");
           break;
         case "Quit":
-          connection.end();
+          process.exit();
       }
-      // console.log(response);
     });
 }
