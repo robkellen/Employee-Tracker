@@ -11,7 +11,7 @@ var connection = mysql.createConnection({
 });
 
 connection.connect(function (err) {
-  if (err) throw err;
+  if (err) console.log(err);
   main();
 });
 
@@ -19,7 +19,6 @@ function main() {
   inquirer
     .prompt([
       {
-        name: "mainOption",
         type: "list",
         message: "What would you like to do?",
         choices: [
@@ -32,12 +31,13 @@ function main() {
           "Update Employee Role",
           "Quit",
         ],
+        name: "mainOption",
       },
     ])
     .then(function (response) {
       switch (response.mainOption) {
         case "View All Employees":
-          console.log("view all emps");
+          viewAllEmps();
           break;
         case "View All Employees by Role":
           console.log("view emps by role");
@@ -61,4 +61,14 @@ function main() {
           process.exit();
       }
     });
+}
+
+function viewAllEmps (){
+  connection.query(
+    "SELECT e.id, e.first_name, e.last_name, role.title, department.name AS department, role.salary, CONCAT(m.first_name, ' ' ,  m.last_name) AS manager FROM employee e LEFT JOIN employee m ON e.manager_id = m.id INNER JOIN role ON e.role_id = role.id INNER JOIN department ON role.department_id = department.id", function (err, res){
+      if (err) throw err;
+      console.table(res);
+      // main();
+    }
+  )
 }

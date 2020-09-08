@@ -5,30 +5,30 @@ USE employee_trackerDB;
 
 CREATE TABLE department (
   id INT AUTO_INCREMENT,
-  dept_name VARCHAR(30) NOT NULL,
+  name VARCHAR(30) NOT NULL,
   PRIMARY KEY (id)
 );
 
-CREATE TABLE position_role (
-  role_id INT AUTO_INCREMENT,
+CREATE TABLE role (
+  id INT AUTO_INCREMENT,
   title VARCHAR(30) NOT NULL,
   salary DECIMAL NOT NULL,
   department_id INT NOT NULL,
-  PRIMARY KEY (role_id),
+  PRIMARY KEY (id),
   FOREIGN KEY (department_id) REFERENCES department(id)
 );
 
 CREATE TABLE employee (
-  emp_id INT AUTO_INCREMENT,
+  id INT AUTO_INCREMENT,
   first_name VARCHAR(30) NOT NULL,
   last_name VARCHAR(30) NOT NULL,
-  emp_role_id INT NOT NULL,
+  role_id INT NOT NULL,
   manager_id INT NULL,
-  PRIMARY KEY (emp_ID),
-  FOREIGN KEY (emp_role_id) REFERENCES position_role(role_id),
-  FOREIGN KEY (manager_id) REFERENCES employee(emp_id)
+  PRIMARY KEY (id),
+  FOREIGN KEY (role_id) REFERENCES role(id),
+  FOREIGN KEY (manager_id) REFERENCES employee(id)
 );
 
 SELECT * FROM department;
-SELECT * FROM position_role;
+SELECT * FROM role;
 SELECT * FROM employee;
