@@ -14,7 +14,14 @@ INSERT INTO role (title, salary, department_id) VALUE ("Finance Director", 12500
 INSERT INTO role (title, salary, department_id) VALUE ("Accountant", 70000, 3);
 
 -- Employees
-INSERT INTO employee (first_name, last_name, emp_role_id, manager_id) VALUE ("John", "Doe", 1);
+INSERT INTO employee (first_name, last_name, emp_role_id, manager_id) VALUE ("John", "Snow", 1, null);
+INSERT INTO employee (first_name, last_name, emp_role_id, manager_id) VALUE ("Cecelia", "Henderson", 2, 1);
+INSERT INTO employee (first_name, last_name, emp_role_id, manager_id) VALUE ("Thomas", "Anderson", 3, null);
+INSERT INTO employee (first_name, last_name, emp_role_id, manager_id) VALUE ("Marcus", "Chong", 4, 3);
+INSERT INTO employee (first_name, last_name, emp_role_id, manager_id) VALUE ("Christian", "Wolff", 5, null);
+INSERT INTO employee (first_name, last_name, emp_role_id, manager_id) VALUE ("Harold", "Crick", 6, 5);
+
+
 
 
 
