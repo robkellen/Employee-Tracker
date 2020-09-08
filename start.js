@@ -18,19 +18,24 @@ var connection = mysql.createConnection({
 
 connection.connect(function(err) {
   if (err) throw err;
-  runSearch();
+  main();
 });
 
-function runSearch (){
+function main (){
   inquirer.prompt([
     {
-      name: "addCategory",
+      name: "mainOption",
       type: "list",
       message: "What would you like to do?",
       choices: [
-        "Add Department",
+        "View All Employees",
+        "View All Employees by Role",
+        "View All Employees by Department",
+        "Add Employee",
         "Add Role",
-        "Add Employee"
+        "Add Department",
+        "Update Employee Role",
+        "Quit",
       ],
     }
   ]).then(function(response){
