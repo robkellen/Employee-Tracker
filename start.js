@@ -52,10 +52,10 @@ function main() {
           addRole();
           break;
         case "Add Department":
-          // console.log("add dept");
+          addDepartment();
           break;
         case "Update Employee Role":
-          // console.log("update emp role");
+          updateEmpRole();
           break;
         case "Quit":
           process.exit();
@@ -211,9 +211,29 @@ function addRole() {
           `INSERT INTO role (title, salary, department_id) VALUE ("${response.new_title}", ${response.new_salary}, (SELECT id FROM department WHERE department.name = "${response.department}"))`
         );
         console.log(
-          `${response.new_title} has been added to ${response.department}`
+          `${response.new_title} has been successfully added to ${response.department}!`
         );
         main();
       });
   });
+}
+
+function addDepartment() {
+  inquirer
+    .prompt([
+      {
+        message:
+          "What is the name of the new department you would like to add?",
+        name: "new_department",
+      },
+    ])
+    .then(function (response) {
+      connection.query(
+        `INSERT INTO department (name) VALUE ("${response.new_department}")`
+      );
+      console.log(
+        `${response.new_department} has been successfully created as a new Department!`
+      );
+      main();
+    });
 }
