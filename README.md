@@ -15,6 +15,8 @@
 ## Description
 This is a CLI app that allows the user to manage their company's employees in a database that includes the department, role, name, salary, and manager (if applicable) for each individual employee.  It also provides functions for the user to change an employees role/department, as well as add new departments, roles, and employees.
 
+![GIF Example](EmpTracker.gif)
+
 
 ## Installation 
 This app utilizes the Inquirer and MySQL npm packages.  To install the packages the user needs to open an integrated terminal and enter the command `npm i` to install these dependencies.  
