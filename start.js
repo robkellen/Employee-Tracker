@@ -11,7 +11,7 @@ var connection = mysql.createConnection({
 });
 
 connection.connect(function (err) {
-  if (err) console.log(err);
+  if (err) throw err;
   main();
 });
 
@@ -40,22 +40,22 @@ function main() {
           viewAllEmps();
           break;
         case "View All Employees by Role":
-          console.log("view emps by role");
+          viewEmpRoles();
           break;
         case "View All Employees by Department":
-          console.log("view all emps by dept");
+          // console.log("view all emps by dept");
           break;
         case "Add Employee":
-          console.log("add emp");
+          // console.log("add emp");
           break;
         case "Add Role":
-          console.log("add role");
+          // console.log("add role");
           break;
         case "Add Department":
-          console.log("add dept");
+          // console.log("add dept");
           break;
         case "Update Employee Role":
-          console.log("update emp role");
+          // console.log("update emp role");
           break;
         case "Quit":
           process.exit();
@@ -63,12 +63,42 @@ function main() {
     });
 }
 
-function viewAllEmps (){
+function viewAllEmps() {
   connection.query(
-    "SELECT e.id, e.first_name, e.last_name, role.title, department.name AS department, role.salary, CONCAT(m.first_name, ' ' ,  m.last_name) AS manager FROM employee e LEFT JOIN employee m ON e.manager_id = m.id INNER JOIN role ON e.role_id = role.id INNER JOIN department ON role.department_id = department.id", function (err, res){
+    "SELECT e.id, e.first_name, e.last_name, role.title, department.name AS department, role.salary, CONCAT(m.first_name, ' ' ,  m.last_name) AS manager FROM employee e LEFT JOIN employee m ON e.manager_id = m.id INNER JOIN role ON e.role_id = role.id INNER JOIN department ON role.department_id = department.id",
+    function (err, res) {
       if (err) throw err;
       console.table(res);
-      // main();
+      main();
     }
-  )
+  );
+}
+
+function viewEmpRoles() {
+  connection.query("SELECT title FROM role", function (err, res) {
+    if (err) console.log(err);
+    const roles = [];
+    res.forEach((role) => {
+      roles.push(role.title);
+    });
+    inquirer
+      .prompt([
+        {
+          type: "list",
+          message: "Which role would you like to view?",
+          choices: roles,
+          name: "chosenRole",
+        },
+      ])
+      .then(function (response) {
+        connection.query(
+          `SELECT e.id, e.first_name, e.last_name, role.title, department.name AS department, role.salary, CONCAT(m.first_name, ' ' ,  m.last_name) AS manager FROM employee e LEFT JOIN employee m ON e.manager_id = m.id INNER JOIN role ON role.title = "${response.chosenRole}" AND e.role_id = role.id INNER JOIN department ON role.department_id = department.id`,
+          function (err, res) {
+            if (err) console.log(err);
+            console.table(res);
+            main();
+          }
+        );
+      });
+  });
 }
