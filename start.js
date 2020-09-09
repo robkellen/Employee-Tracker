@@ -43,7 +43,7 @@ function main() {
           viewEmpRoles();
           break;
         case "View All Employees by Department":
-          // console.log("view all emps by dept");
+          viewEmpDept();
           break;
         case "Add Employee":
           // console.log("add emp");
@@ -95,6 +95,35 @@ function viewEmpRoles() {
           `SELECT e.id, e.first_name, e.last_name, role.title, department.name AS department, role.salary, CONCAT(m.first_name, ' ' ,  m.last_name) AS manager FROM employee e LEFT JOIN employee m ON e.manager_id = m.id INNER JOIN role ON role.title = "${response.chosenRole}" AND e.role_id = role.id INNER JOIN department ON role.department_id = department.id`,
           function (err, res) {
             if (err) console.log(err);
+            console.table(res);
+            main();
+          }
+        );
+      });
+  });
+}
+
+function viewEmpDept() {
+  connection.query("SELECT name FROM department", function (err, res) {
+    if (err) console.log(err);
+    const departments = [];
+    res.forEach((department) => {
+      departments.push(department.name);
+    });
+    inquirer
+      .prompt([
+        {
+          type: "list",
+          message: "Which department would you like to view?",
+          choices: departments,
+          name: "chosenDept",
+        },
+      ])
+      .then(function (response) {
+        connection.query(
+          `SELECT e.id, e.first_name, e.last_name, role.title, department.name AS department, role.salary, CONCAT(m.first_name, " " ,  m.last_name) AS manager FROM employee e LEFT JOIN employee m ON e.manager_id = m.id INNER JOIN role ON e.role_id = role.id INNER JOIN department ON role.department_id = department.id WHERE department.name = "${response.chosenDept}"`,
+          function (err, res) {
+            if (err) throw err;
             console.table(res);
             main();
           }
