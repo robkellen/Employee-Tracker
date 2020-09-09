@@ -237,3 +237,42 @@ function addDepartment() {
       main();
     });
 }
+
+function updateEmpRole() {
+  connection.query(
+    `SELECT CONCAT(e.first_name, ' ', e.last_name) AS name FROM employee e`,
+    function (err, res) {
+      if (err) console.log(err);
+      const employees = [];
+      res.forEach((employee) => {
+        employees.push(employee.name);
+      });
+      connection.query(`SELECT title FROM role`, function (err, res) {
+        if (err) console.log(err);
+        const roles = [];
+        res.forEach((role) => {
+          roles.push(role.title);
+        });
+        inquirer.prompt([
+          {
+            type: "list",
+            message: "Which employee would you like to update?",
+            choices: employees,
+            name: "chosen_employee",
+          },
+          {
+            type: "list",
+            message: "What is the employee's new role?",
+            choices: roles,
+            name: "new_chosen_role",
+          },
+        ]).then(function(response){
+          connection.query(
+          `UPDATE employee e SET role_id = (SELECT id FROM role WHERE role.title = "${response.new_chosen_role}") WHERE CONCAT (e.first_name, ' ', e.last_name) = "${response.chosen_employee}"`);
+          console.log(`${response.chosen_employee}'s new role has been successfuly set as ${response.new_chosen_role}!`);
+          main();
+        })
+      });
+    }
+  );
+}
