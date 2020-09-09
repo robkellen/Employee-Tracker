@@ -46,7 +46,7 @@ function main() {
           viewEmpDept();
           break;
         case "Add Employee":
-          // console.log("add emp");
+          addEmp();
           break;
         case "Add Role":
           // console.log("add role");
@@ -129,5 +129,56 @@ function viewEmpDept() {
           }
         );
       });
+  });
+}
+
+function addEmp() {
+  connection.query("SELECT title FROM role", function (err, res) {
+    if (err) console.log(err);
+    const roles = [];
+    res.forEach((role) => {
+      roles.push(role.title);
+    });
+    connection.query(
+      `SELECT CONCAT(e.first_name, ' ' , e.last_name) AS name FROM employee e`,
+
+      function (err, res) {
+        if (err) console.log(err);
+        const managers = [];
+        res.forEach((manager) => managers.push(manager.name));
+        inquirer
+          .prompt([
+            {
+              message: "What is the first name of your new employee?",
+              name: "new_first_name",
+            },
+            {
+              message: "What is the last name of your new employee?",
+              name: "new_last_name",
+            },
+            {
+              type: "list",
+              message: "What will be your new employee's role?",
+              choices: roles,
+              name: "new_role",
+            },
+            {
+              type: "list",
+              message: "Who will be the manager of your new employee?",
+              choices: managers,
+              name: "new_manager",
+            },
+          ])
+          .then(function (response) {
+            connection.query(
+              `INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUE ("${response.new_first_name}", "${response.new_last_name}", (SELECT id FROM role WHERE role.title = "${response.new_role}"), (SELECT id FROM employee e WHERE CONCAT(e.first_name, ' ',e.last_name) = "${response.new_manager}"))`
+            );
+            console.log(
+              `${response.new_first_name} ${response.new_last_name} successfully added!`
+            );
+            main();
+          });
+      }
+    );
   });
 }
