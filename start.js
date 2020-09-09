@@ -1,7 +1,8 @@
 const mysql = require("mysql");
 const inquirer = require("inquirer");
-const consoleTable = require("console.table");
+// const consoleTable = require("console.table");
 
+//set up connection to database through mySQL
 var connection = mysql.createConnection({
   host: "localhost",
   port: 3306,
@@ -9,9 +10,10 @@ var connection = mysql.createConnection({
   password: "",
   database: "employee_trackerDB",
 });
-
+//connect to mySQL database
 connection.connect(function (err) {
   if (err) throw err;
+  //begin prompts at main menu
   main();
 });
 
@@ -35,6 +37,7 @@ function main() {
       },
     ])
     .then(function (response) {
+      //invoke function based on user selection
       switch (response.mainOption) {
         case "View All Employees":
           viewAllEmps();
@@ -62,7 +65,7 @@ function main() {
       }
     });
 }
-
+//view all employees
 function viewAllEmps() {
   connection.query(
     "SELECT e.id, e.first_name, e.last_name, role.title, department.name AS department, role.salary, CONCAT(m.first_name, ' ' ,  m.last_name) AS manager FROM employee e LEFT JOIN employee m ON e.manager_id = m.id INNER JOIN role ON e.role_id = role.id INNER JOIN department ON role.department_id = department.id",
@@ -73,7 +76,7 @@ function viewAllEmps() {
     }
   );
 }
-
+//view all employees of selected role
 function viewEmpRoles() {
   connection.query("SELECT title FROM role", function (err, res) {
     if (err) console.log(err);
@@ -102,7 +105,7 @@ function viewEmpRoles() {
       });
   });
 }
-
+//view all employees within selected department
 function viewEmpDept() {
   connection.query("SELECT name FROM department", function (err, res) {
     if (err) console.log(err);
@@ -131,7 +134,7 @@ function viewEmpDept() {
       });
   });
 }
-
+//add new employee
 function addEmp() {
   connection.query("SELECT title FROM role", function (err, res) {
     if (err) console.log(err);
@@ -173,7 +176,7 @@ function addEmp() {
               `INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUE ("${response.new_first_name}", "${response.new_last_name}", (SELECT id FROM role WHERE role.title = "${response.new_role}"), (SELECT id FROM employee e WHERE CONCAT(e.first_name, ' ',e.last_name) = "${response.new_manager}"))`
             );
             console.log(
-              `${response.new_first_name} ${response.new_last_name} successfully added!`
+              `------${response.new_first_name} ${response.new_last_name} successfully added!------`
             );
             main();
           });
@@ -181,7 +184,7 @@ function addEmp() {
     );
   });
 }
-
+// add new role to a department
 function addRole() {
   connection.query(`SELECT name FROM department`, function (err, res) {
     if (err) console.log(err);
@@ -211,13 +214,13 @@ function addRole() {
           `INSERT INTO role (title, salary, department_id) VALUE ("${response.new_title}", ${response.new_salary}, (SELECT id FROM department WHERE department.name = "${response.department}"))`
         );
         console.log(
-          `${response.new_title} has been successfully added to ${response.department}!`
+          `------${response.new_title} has been successfully added to the ${response.department} department!------`
         );
         main();
       });
   });
 }
-
+//add new department
 function addDepartment() {
   inquirer
     .prompt([
@@ -237,7 +240,7 @@ function addDepartment() {
       main();
     });
 }
-
+//update role, department, and salary of a current employee
 function updateEmpRole() {
   connection.query(
     `SELECT CONCAT(e.first_name, ' ', e.last_name) AS name FROM employee e`,
@@ -253,25 +256,30 @@ function updateEmpRole() {
         res.forEach((role) => {
           roles.push(role.title);
         });
-        inquirer.prompt([
-          {
-            type: "list",
-            message: "Which employee would you like to update?",
-            choices: employees,
-            name: "chosen_employee",
-          },
-          {
-            type: "list",
-            message: "What is the employee's new role?",
-            choices: roles,
-            name: "new_chosen_role",
-          },
-        ]).then(function(response){
-          connection.query(
-          `UPDATE employee e SET role_id = (SELECT id FROM role WHERE role.title = "${response.new_chosen_role}") WHERE CONCAT (e.first_name, ' ', e.last_name) = "${response.chosen_employee}"`);
-          console.log(`${response.chosen_employee}'s new role has been successfuly set as ${response.new_chosen_role}!`);
-          main();
-        })
+        inquirer
+          .prompt([
+            {
+              type: "list",
+              message: "Which employee would you like to update?",
+              choices: employees,
+              name: "chosen_employee",
+            },
+            {
+              type: "list",
+              message: "What is the employee's new role?",
+              choices: roles,
+              name: "new_chosen_role",
+            },
+          ])
+          .then(function (response) {
+            connection.query(
+              `UPDATE employee e SET role_id = (SELECT id FROM role WHERE role.title = "${response.new_chosen_role}") WHERE CONCAT (e.first_name, ' ', e.last_name) = "${response.chosen_employee}"`
+            );
+            console.log(
+              `------${response.chosen_employee}'s new role has been successfuly set as ${response.new_chosen_role}!------`
+            );
+            main();
+          });
       });
     }
   );
