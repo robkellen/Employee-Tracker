@@ -49,7 +49,7 @@ function main() {
           addEmp();
           break;
         case "Add Role":
-          // console.log("add role");
+          addRole();
           break;
         case "Add Department":
           // console.log("add dept");
@@ -141,7 +141,6 @@ function addEmp() {
     });
     connection.query(
       `SELECT CONCAT(e.first_name, ' ' , e.last_name) AS name FROM employee e`,
-
       function (err, res) {
         if (err) console.log(err);
         const managers = [];
@@ -180,5 +179,41 @@ function addEmp() {
           });
       }
     );
+  });
+}
+
+function addRole() {
+  connection.query(`SELECT name FROM department`, function (err, res) {
+    if (err) console.log(err);
+    const departments = [];
+    res.forEach((department) => {
+      departments.push(department.name);
+    });
+    inquirer
+      .prompt([
+        {
+          message: "What is the title of the new role you would like to add?",
+          name: "new_title",
+        },
+        {
+          message: "What is the salary associated with this role?",
+          name: "new_salary",
+        },
+        {
+          type: "list",
+          message: "Which department will this new role be associated with?",
+          choices: departments,
+          name: "department",
+        },
+      ])
+      .then(function (response) {
+        connection.query(
+          `INSERT INTO role (title, salary, department_id) VALUE ("${response.new_title}", ${response.new_salary}, (SELECT id FROM department WHERE department.name = "${response.department}"))`
+        );
+        console.log(
+          `${response.new_title} has been added to ${response.department}`
+        );
+        main();
+      });
   });
 }
